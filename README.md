@@ -11,8 +11,8 @@
 ```
 
 A fast, light webserver for easily uploading ROMs to a Raspberry Pi running
-RetroPie. Run the server on your Pi, and go to `<hostname>.lan:<port>` to drop
-ROMs in.
+RetroPie. Run the server on your Pi, and go to `<hostname>.lan:<port>` while
+connected to the same network as the Pi to drop ROMs in.
 
 # Dependencies
 [Rust](https://rustup.rs/) and (for development only) [Rollup](https://rollupjs.org/).
