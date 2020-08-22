@@ -10,9 +10,9 @@
  $$/   $$/  $$$$$$/  $$/      $$/       $$$$$$$/  $$/   $$/  $$$$$$/  $$/
 ```
 
-A fast, light webserver you can run directly on your Raspberry Pi running
-RetroPie, to make ROM uploads easy. Go to `<hostname>.lan:<port>` and drop ROMs
-onto your Pi.
+A fast, light webserver that runs directly on your Raspberry Pi running
+RetroPie and makes ROM uploads easy. Go to `<hostname>.lan:<port>` and drop
+ROMs onto your Pi.
 
 # Dependencies
 [Rust](https://rustup.rs/) and [Rollup](https://rollupjs.org/).
