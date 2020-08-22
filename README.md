@@ -15,18 +15,28 @@ RetroPie. Run the server on your Pi, and go to `<hostname>.lan:<port>` to drop
 ROMs in.
 
 # Dependencies
-[Rust](https://rustup.rs/) and [Rollup](https://rollupjs.org/).
+[Rust](https://rustup.rs/) and (for development only) [Rollup](https://rollupjs.org/).
 
-# Building
+# Development
 
+To run the server:
+```bash
+cargo run <PORT>
 ```
-cargo build --release
+
+To build the JS:
+
+```bash
 cd assets/javascript
 rollup --config
 ```
 
-# Running
+# Building and running on your Pi
 
-```
+The compiled JavaScript is checked into builds on Github, so you won't need the
+JS toolchain on your Pi: you'll only need Rust. To build and run the webserver:
+
+```bash
+cargo build --release
 ./target/release/romdrop <PORT>
 ```
