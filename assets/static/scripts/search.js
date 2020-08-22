@@ -212,7 +212,7 @@
   function topHitOrHover() {
     const topHit = document.querySelector('.' + TOP_HIT_CLASS);
     if(topHit) return topHit;
-    return document.querySelector(".emulator a:hover");
+    return document.querySelector(".mousemode .emulator a:hover");
   }
 
   function unselect(topHit) {
