@@ -35,28 +35,6 @@
   100% { color: #000; }
 }
 
-@keyframes bg-flicker {
-  0% { background-color: #f00; left: 0px; }
-  24% { background-color: #f00; left: 0px; }
-  25% { background-color: #0f0; left: -10px; }
-  49% { background-color: #0f0; left: -10px; }
-  50% { background-color: #00f; left: 0px; }
-  74% { background-color: #00f; left: 0px; }
-  75% { background-color: #000; left: -10px; }
-  100% { background-color: #000; left: -10px; }
-}
-
-@keyframes bg-flicker-color {
-  0% { background-color: #f00; }
-  24% { background-color: #f00; }
-  25% { background-color: #0f0; }
-  49% { background-color: #0f0; }
-  50% { background-color: #00f; }
-  74% { background-color: #00f; }
-  75% { background-color: #000; }
-  100% { background-color: #000; }
-}
-
 * {
   box-sizing: border-box;
 }
@@ -80,10 +58,6 @@ h1 {
 .flickering {
   position: relative;
   animation: flicker 0.2s linear infinite;
-}
-.bg-flickering {
-  position: relative;
-  animation: bg-flicker 0.2s linear infinite;
 }
 .anim-once {
   animation-iteration-count: 1;

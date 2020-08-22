@@ -13,6 +13,8 @@
   const header = document.querySelector("h1");
   const body = document.body;
 
+  screenshake({ header: true });
+
   body.addEventListener("mousemove", (e) => {
     mouseIsMoving = true;
     body.classList.add(MOUSE_MODE_CLASS);
@@ -53,9 +55,10 @@
       const topHit = document.querySelector("." + TOP_HIT_CLASS);
       if(topHit) unselect(topHit);
     });
+    // Faster clicks
     (function(link) {
       link.addEventListener("mousedown", (e) => {
-        if(e.button === 0) link.classList.add("bg-flickering");
+        if(e.button === 0) window.location.href = link.pathname;
       });
     }(link));
   }
@@ -76,6 +79,14 @@
         typeahead.value = "";
         search("");
       }
+      typeahead.focus();
+      window.scrollTo(0, 0);
+      if(topHit) unselect(topHit);
+    }
+    else if(e.key === "/") {
+      body.classList.remove(MOUSE_MODE_CLASS);
+      e.preventDefault();
+      screenshake({ header: true });
       typeahead.focus();
       window.scrollTo(0, 0);
       if(topHit) unselect(topHit);
@@ -145,9 +156,7 @@
   function attemptNavigation() {
     const topHit = document.querySelector('.' + TOP_HIT_CLASS);
     if(topHit) {
-      topHit.classList.remove('anim-once');
       window.location.href = topHit.pathname;
-      topHit.classList.add("bg-flickering");
     }
   }
 
