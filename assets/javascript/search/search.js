@@ -32,13 +32,13 @@ setTimeout(() => {
 typeahead.addEventListener("input", (e) => {
   const text = e.target.value;
   if(!search(text)) screenshake({ header: true });
-  else screenshake({ typeahead: true });
+  else screenshake();
 });
 
-function screenshake(opts) {
+function screenshake(opts = {}) {
   if(flickerTimeout) clearTimeout(flickerTimeout);
   if(opts.header) header.classList.add("flickering");
-  if(opts.typeahead) typeahead.classList.add("flicker-color");
+  typeahead.classList.add("flicker-color");
   flickerTimeout = setTimeout(() => {
     header.classList.remove("flickering");
     typeahead.classList.remove("flicker-color");
@@ -69,7 +69,12 @@ document.addEventListener("keydown", (e) => {
   const topHit = topHitOrHover();
   const notHidden = document.querySelectorAll(".searchable:not(.hidden)");
 
-  if(e.key === "Escape") {
+  if(e.key === "Backspace") {
+    if(document.activeElement === typeahead) {
+      if(!typeahead.value) screenshake({ header: true });
+    }
+  }
+  else if(e.key === "Escape") {
     body.classList.remove(MOUSE_MODE_CLASS);
     screenshake({ header: true });
     if(document.activeElement === typeahead) {

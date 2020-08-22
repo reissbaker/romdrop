@@ -7,7 +7,7 @@
   screenshake();
 
   document.addEventListener("keydown", (e) => {
-    if(e.key === "Escape") {
+    if(e.key === "Escape" || e.key === "Backspace") {
       e.preventDefault();
       window.location.replace("/");
     }
