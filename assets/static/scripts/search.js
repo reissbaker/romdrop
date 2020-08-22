@@ -18,6 +18,8 @@
   body.addEventListener("mousemove", (e) => {
     mouseIsMoving = true;
     body.classList.add(MOUSE_MODE_CLASS);
+    const topHit = queryTopHit();
+    if(topHit) unselect(topHit);
     if(mouseMoveTimeout) clearTimeout(mouseMoveTimeout);
     mouseMoveTimeout = setTimeout(() => {
       mouseIsMoving = false;
@@ -210,8 +212,13 @@
   }
 
   function topHitOrHover() {
-    const topHit = document.querySelector('.' + TOP_HIT_CLASS);
-    if(topHit) return topHit;
+    return queryTopHit() || queryHovered();
+  }
+
+  function queryTopHit() {
+    return document.querySelector('.' + TOP_HIT_CLASS);
+  }
+  function queryHovered() {
     return document.querySelector(".mousemode .emulator a:hover");
   }
 
