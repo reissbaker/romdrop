@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ROM DROP</title>
+    <link rel="stylesheet" href="/static/styles/site.css">
+    <script defer src="/static/scripts/search.js"></script>
+  </head>
+  <body>
+    <section class="centered">
+      <h1>ROM DROP</h1>
+      <form>
+        <input type="text" class="typeahead" placeholder="Search for systems...">
+      </form>
+      <ul>
+        {{#each emulators as |emulator|}}
+        <li class="emulator searchable">
+          <a href="/system/{{emulator.slug}}">
+            {{ emulator.display }}
+            <span class="arrow up-arrow"></span>
+            <span class="arrow down-arrow"></span>
+          </a>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+  </body>
+</html>

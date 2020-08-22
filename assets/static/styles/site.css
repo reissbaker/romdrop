@@ -1,0 +1,170 @@
+@font-face {
+  font-family: 'november';
+  src: url('/static/november.woff2') format('woff2'),
+       url('/static/november.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: '3d-pixel';
+  src: url('/static/3d-pixel.woff2') format('woff2'),
+       url('/static/3d-pixel.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@keyframes flicker {
+  0% { color: #f00; left: 0px; }
+  24% { color: #f00; left: 0px; }
+  25% { color: #0f0; left: -10px; }
+  49% { color: #0f0; left: -10px; }
+  50% { color: #00f; left: 0px; }
+  74% { color: #00f; left: 0px; }
+  75% { color: #000; left: -10px; }
+  100% { color: #000; left: -10px; }
+}
+
+@keyframes flicker-color {
+  0% { color: #f00; }
+  24% { color: #f00; }
+  25% { color: #0f0; }
+  49% { color: #0f0; }
+  50% { color: #00f; }
+  74% { color: #00f; }
+  75% { color: #000; }
+  100% { color: #000; }
+}
+
+@keyframes bg-flicker {
+  0% { background-color: #f00; left: 0px; }
+  24% { background-color: #f00; left: 0px; }
+  25% { background-color: #0f0; left: -10px; }
+  49% { background-color: #0f0; left: -10px; }
+  50% { background-color: #00f; left: 0px; }
+  74% { background-color: #00f; left: 0px; }
+  75% { background-color: #000; left: -10px; }
+  100% { background-color: #000; left: -10px; }
+}
+
+@keyframes bg-flicker-color {
+  0% { background-color: #f00; }
+  24% { background-color: #f00; }
+  25% { background-color: #0f0; }
+  49% { background-color: #0f0; }
+  50% { background-color: #00f; }
+  74% { background-color: #00f; }
+  75% { background-color: #000; }
+  100% { background-color: #000; }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "november", monospace;
+  font-size: 20px;
+  overflow-y: scroll;
+}
+
+h1 {
+  text-align: center;
+  font-size: 120px;
+  line-height: 70px;
+  font-family: "3d-pixel";
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.flickering {
+  position: relative;
+  animation: flicker 0.2s linear infinite;
+}
+.bg-flickering {
+  position: relative;
+  animation: bg-flicker 0.2s linear infinite;
+}
+.anim-once {
+  animation-iteration-count: 1;
+}
+.flicker-color {
+  animation: flicker-color 0.2s linear infinite;
+}
+
+.centered {
+  margin: auto;
+  max-width: 800px;
+  position: relative;
+}
+
+.nav {
+  position: absolute;
+  left: 0;
+  top: 30px;
+  z-index: 100;
+}
+
+.hidden {
+  display: none;
+}
+
+.typeahead {
+  width: 100%;
+  padding: 30px;
+  font-family: "november", monospace;
+  font-size: 20px;
+  margin-bottom: 30px;
+  margin-top: 30px;
+  border: 4px solid #fff;
+  border-radius: 0;
+}
+.typeahead:focus {
+  border-color: #333;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.arrow:before {
+  float: right;
+  background-color: #333;
+  color: #fff;
+  padding-left: 7px;
+  padding-right: 7px;
+  padding-top: 10px;
+  position: relative;
+  top: -7px;
+  margin-left: 4px;
+  display: none;
+}
+.up-arrow:before {
+  content: "^";
+}
+.down-arrow:before {
+  content: "^";
+  transform: rotate(180deg);
+}
+
+.emulator a {
+  display: block;
+  padding: 30px;
+  padding-top: 32px;
+  margin-bottom: 25px;
+  border: 4px solid #fff;
+}
+.mousemode .emulator a:hover, .emulator a.top-hit {
+  background-color: #ff0;
+  border-color: #333;
+}
+.emulator a.top-hit .arrow:before {
+  display: inline-block;
+}
+
+
+a, a:visited, a:active {
+  color: #333;
+  text-decoration: none;
+}
