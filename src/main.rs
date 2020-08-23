@@ -84,7 +84,8 @@ async fn index_page() -> Result<HttpResponse> {
     let data = IndexTemplateData {
         emulators: EMULATORS.to_vec(),
     };
-    let rendered = reg.render_template(&index, &data)
+    let rendered = reg
+        .render_template(&index, &data)
         .map_err(ErrorInternalServerError)?;
     Ok(html_response(HttpResponse::Ok(), rendered))
 }
@@ -110,7 +111,8 @@ async fn emulator_page(emulator_path: web::Path<EmulatorPath>) -> Result<HttpRes
         emulator: &emulator.heading.to_uppercase(),
         slug: &emulator.slug,
     };
-    let rendered = reg.render_template(&upload, &data)
+    let rendered = reg
+        .render_template(&upload, &data)
         .map_err(ErrorInternalServerError)?;
     Ok(html_response(HttpResponse::Ok(), rendered))
 }
@@ -155,7 +157,8 @@ async fn upload_rom(
         emulator: &emulator.heading.to_uppercase(),
         slug: &emulator.slug,
     };
-    let rendered = reg.render_template(&upload_templ, &data)
+    let rendered = reg
+        .render_template(&upload_templ, &data)
         .map_err(ErrorInternalServerError)?;
     Ok(html_response(HttpResponse::Created(), rendered))
 }
@@ -178,6 +181,7 @@ async fn read_file(path: &str) -> Result<String> {
 }
 
 fn html_response(mut response: ResponseBuilder, body: String) -> HttpResponse {
-    response.set_header(http::header::CONTENT_TYPE, "text/html; charset=utf-8")
+    response
+        .set_header(http::header::CONTENT_TYPE, "text/html; charset=utf-8")
         .body(body)
 }
