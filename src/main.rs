@@ -1,5 +1,8 @@
 use std::{str, env};
-use actix_http::error::ErrorUnprocessableEntity;
+use actix_http::{
+    error::ErrorUnprocessableEntity,
+    ResponseBuilder,
+};
 use actix_multipart::Multipart;
 use actix_web::{
     web,
@@ -83,7 +86,7 @@ async fn index_page() -> Result<HttpResponse> {
     };
     let rendered = reg.render_template(&index, &data)
         .map_err(ErrorInternalServerError)?;
-    Ok(html_response(rendered))
+    Ok(html_response(HttpResponse::Ok(), rendered))
 }
 
 #[derive(Serialize)]
@@ -106,32 +109,29 @@ async fn emulator_page(emulator_path: web::Path<EmulatorPath>) -> Result<HttpRes
     };
     let rendered = reg.render_template(&upload, &data)
         .map_err(ErrorInternalServerError)?;
-    Ok(html_response(rendered))
+    Ok(html_response(HttpResponse::Ok(), rendered))
 }
 
 
-#[post("/rom/{name}")]
+#[post("/system/{name}")]
 async fn upload_rom(
     emulator_path: web::Path<EmulatorPath>,
     mut payload: Multipart,
 ) -> Result<HttpResponse> {
     let emulator = parse_emulator(&emulator_path.name)?;
-    println!("hi");
+    let reg = Handlebars::new();
 
     // Parse the filename
     let mut field = payload
         .try_next()
         .await?
         .ok_or_else(|| ErrorUnprocessableEntity("No files sent"))?;
-    println!("hi");
     let content_type = field
         .content_disposition()
         .ok_or_else(|| actix_web::error::ParseError::Incomplete)?;
-    println!("contenty");
     let filename = content_type
         .get_filename()
         .ok_or_else(|| actix_web::error::ParseError::Incomplete)?;
-    println!("fil");
     let path = sanitize_filename::sanitize(&filename);
 
     // Create the appropriate emulator dir if necessary
@@ -147,7 +147,14 @@ async fn upload_rom(
         file.write_all(&data).await?
     }
 
-    Ok(HttpResponse::Created().finish())
+    let upload_templ = read_file("assets/pages/upload.html").await?;
+    let data = UploadTemplateData {
+        emulator: &emulator.heading.to_uppercase(),
+        slug: &emulator.slug,
+    };
+    let rendered = reg.render_template(&upload_templ, &data)
+        .map_err(ErrorInternalServerError)?;
+    Ok(html_response(HttpResponse::Created(), rendered))
 }
 
 /// Given a slug, returns the matching EmulatorData.
@@ -167,7 +174,7 @@ async fn read_file(path: &str) -> Result<String> {
     Ok(str::from_utf8(&bytes)?.to_string())
 }
 
-fn html_response(body: String) -> HttpResponse {
-    HttpResponse::Ok().set_header(http::header::CONTENT_TYPE, "text/html; charset=utf-8")
+fn html_response(mut response: ResponseBuilder, body: String) -> HttpResponse {
+    response.set_header(http::header::CONTENT_TYPE, "text/html; charset=utf-8")
         .body(body)
 }
