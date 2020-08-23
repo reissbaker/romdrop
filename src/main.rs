@@ -98,6 +98,9 @@ struct UploadTemplateData<'a> {
 struct EmulatorPath {
     name: String,
 }
+
+/// IMPORTANT TODO: CSRF
+/// Use a cookie session that indexes into some in-memory hash
 #[get("/system/{name}")]
 async fn emulator_page(emulator_path: web::Path<EmulatorPath>) -> Result<HttpResponse> {
     let emulator = parse_emulator(&emulator_path.name)?;
