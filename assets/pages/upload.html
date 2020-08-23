@@ -12,6 +12,10 @@
         <a href="/">&larr; Home</a>
       </section>
       <h1>{{ emulator }} DROP</h1>
+      <form method="post" action="/rom/{{ slug }}" enctype="multipart/form-data">
+        <input type="file" name="filename">
+        <input type="submit">
+      </form>
     </section>
   </body>
 </html>
