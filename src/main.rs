@@ -104,7 +104,7 @@ struct EmulatorPath {
 
 /// IMPORTANT TODO: CSRF
 /// Use a cookie session that indexes into some in-memory hash
-#[get("/system/{name}")]
+#[get("/roms/{name}")]
 async fn emulator_page(emulator_path: web::Path<EmulatorPath>) -> Result<HttpResponse> {
     let emulator = parse_emulator(&emulator_path.name)?;
     let reg = Handlebars::new();
@@ -123,7 +123,7 @@ async fn emulator_page(emulator_path: web::Path<EmulatorPath>) -> Result<HttpRes
 }
 
 
-#[post("/system/{name}")]
+#[post("/roms/{name}")]
 async fn upload_rom(
     emulator_path: web::Path<EmulatorPath>,
     mut payload: Multipart,
