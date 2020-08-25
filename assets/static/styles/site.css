@@ -232,11 +232,40 @@ a, a:visited, a:active {
 }
 
 @media (max-width: 600px) {
+  h2 {
+    font-size: 24px;
+  }
   h1 {
-    line-height: 75px;
+    line-height: 66px;
     max-width: 500px;
+    font-size: 80px;
+    margin-top: 73px;
   }
   .nav {
-    top: -80px;
+    top: -60px;
+  }
+  .typeahead {
+    margin-top: 3px;
+    margin-bottom: 0;
+  }
+  .drag-n-drop {
+    margin-top: -5px;
+  }
+}
+@media (max-width: 330px) {
+  h1 {
+    line-height: 66px;
+    max-width: 500px;
+    font-size: 75px;
+    margin-top: 73px;
+  }
+}
+
+@media (max-width: 300px) {
+  h1 {
+    line-height: 66px;
+    max-width: 500px;
+    font-size: 62px;
+    margin-top: 73px;
   }
 }
