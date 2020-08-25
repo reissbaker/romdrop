@@ -111,7 +111,7 @@ async fn emulator_page(emulator_path: web::Path<EmulatorPath>) -> Result<HttpRes
     let upload = read_file("assets/pages/upload.html").await?;
     let roms = read_dir(&format!("data/roms/{}", emulator.slug)).await?;
     let data = UploadTemplateData {
-        emulator: &emulator.heading.to_uppercase(),
+        emulator: &emulator.heading,
         slug: &emulator.slug,
         roms: &roms,
         no_roms: roms.len() == 0,
@@ -161,7 +161,7 @@ async fn upload_rom(
     let upload_templ = read_file("assets/pages/upload.html").await?;
     let roms = read_dir(&format!("data/roms/{}", emulator.slug)).await?;
     let data = UploadTemplateData {
-        emulator: &emulator.heading.to_uppercase(),
+        emulator: &emulator.heading,
         slug: &emulator.slug,
         roms: &roms,
         no_roms: roms.len() == 0,
