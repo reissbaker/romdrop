@@ -195,7 +195,7 @@ function linkOf(searchable) {
 }
 
 function linkMatches(link, text) {
-    const match = strMatch(link.pathname, "/system/" + text) ||
+    const match = strMatch(link.pathname, "/roms/" + text) ||
                   strMatch(link.innerText, text);
     return match;
 }
