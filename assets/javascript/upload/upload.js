@@ -41,7 +41,7 @@ domDrag.forTarget(document.body, {
 });
 
 uploadForm.addEventListener('mousedown', (e) => {
-  if(e.isTrusted && e.target === uploadForm) {
+  if(e.button === 0 && e.isTrusted && e.target === uploadForm) {
     fileInput.click();
   }
 }, false);
