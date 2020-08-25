@@ -74,7 +74,7 @@ h1 {
 
 .centered {
   margin: auto;
-  max-width: 800px;
+  max-width: 950px;
   position: relative;
 }
 
@@ -229,4 +229,14 @@ ul {
 a, a:visited, a:active {
   color: #333;
   text-decoration: none;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    line-height: 75px;
+    max-width: 500px;
+  }
+  .nav {
+    top: -80px;
+  }
 }
