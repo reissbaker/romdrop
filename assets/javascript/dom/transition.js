@@ -9,7 +9,7 @@ export function watch(el) {
 
   function nextFinish(opts) {
     return new Promise((resolve, reject) => {
-      if(opts.waitForStart && !everStarted) {
+      if(!everStarted && opts.waitForStart) {
         endCallbacks.push(resolve);
         return;
       }
@@ -18,6 +18,7 @@ export function watch(el) {
         endCallbacks.push(resolve);
         return;
       }
+
       resolve();
     });
   }

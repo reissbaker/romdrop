@@ -50,7 +50,7 @@
 
     function nextFinish(opts) {
       return new Promise((resolve, reject) => {
-        if(opts.waitForStart && !everStarted) {
+        if(!everStarted && opts.waitForStart) {
           endCallbacks.push(resolve);
           return;
         }
@@ -59,6 +59,7 @@
           endCallbacks.push(resolve);
           return;
         }
+
         resolve();
       });
     }

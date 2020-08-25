@@ -62,7 +62,7 @@ h1 {
 
 .flickering {
   position: relative;
-  animation: flicker 0.2s linear infinite;
+  animation: flicker 0.5s linear infinite;
 }
 .anim-once {
   animation-iteration-count: 1;
