@@ -32,7 +32,7 @@ struct EmulatorData<'a> {
 const EMULATORS: &'static [EmulatorData<'static>] = &[
     EmulatorData { slug: "nes", display: "NES", heading: "NES" },
     EmulatorData { slug: "snes", display: "SNES", heading: "SNES" },
-    EmulatorData { slug: "gb", display: "Gameboy", heading: "GB" },
+    EmulatorData { slug: "gb", display: "Gameboy", heading: "Gameboy" },
     EmulatorData { slug: "gbc", display: "Gameboy Color", heading: "GB Color" },
     EmulatorData { slug: "gba", display: "Gameboy Advance", heading: "GBA" },
     EmulatorData { slug: "n64", display: "N64", heading: "N64" },
@@ -94,6 +94,8 @@ async fn index_page() -> Result<HttpResponse> {
 struct UploadTemplateData<'a> {
     emulator: &'a str,
     slug: &'a str,
+    roms: &'a Vec<String>,
+    no_roms: bool,
 }
 #[derive(Deserialize)]
 struct EmulatorPath {
@@ -107,9 +109,12 @@ async fn emulator_page(emulator_path: web::Path<EmulatorPath>) -> Result<HttpRes
     let emulator = parse_emulator(&emulator_path.name)?;
     let reg = Handlebars::new();
     let upload = read_file("assets/pages/upload.html").await?;
+    let roms = read_dir(&format!("data/roms/{}", emulator.slug)).await?;
     let data = UploadTemplateData {
         emulator: &emulator.heading.to_uppercase(),
         slug: &emulator.slug,
+        roms: &roms,
+        no_roms: roms.len() == 0,
     };
     let rendered = reg
         .render_template(&upload, &data)
@@ -152,10 +157,14 @@ async fn upload_rom(
         file.write_all(&data).await?
     }
 
+    // Render the upload page so people can upload more ROMs
     let upload_templ = read_file("assets/pages/upload.html").await?;
+    let roms = read_dir(&format!("data/roms/{}", emulator.slug)).await?;
     let data = UploadTemplateData {
         emulator: &emulator.heading.to_uppercase(),
         slug: &emulator.slug,
+        roms: &roms,
+        no_roms: roms.len() == 0,
     };
     let rendered = reg
         .render_template(&upload_templ, &data)
@@ -175,11 +184,42 @@ fn parse_emulator(slug: &str) -> Result<&EmulatorData<'static>> {
     }
 }
 
+/// Read an entire file to a string
 async fn read_file(path: &str) -> Result<String> {
     let bytes = tokio::fs::read(path).await?;
     Ok(str::from_utf8(&bytes)?.to_string())
 }
 
+/// Read an entire directory to a Vec of strings
+async fn read_dir(path: &str) -> Result<Vec<String>> {
+    let dir_to_read = tokio::fs::read_dir(path).await;
+    match dir_to_read {
+        Err(_) => {
+            // The path doesn't exist, aka no ROMs. That's fine.
+            Ok(vec!())
+        },
+        Ok(dir) => {
+            let entries = dir
+                .map(|dir_entry| {
+                    let filename = dir_entry
+                        .map_err(ErrorInternalServerError)?
+                        .file_name()
+                        .into_string()
+                        .map_err(|_| {
+                            ErrorInternalServerError("Invalid ROM filename found on disk")
+                        })?;
+
+                    Ok(filename)
+                })
+                .collect::<Result<Vec<String>>>()
+                .await?;
+
+            Ok(entries)
+        }
+    }
+}
+
+/// Given a ResponseBuilder, set its content type and body to return the string as HTML
 fn html_response(mut response: ResponseBuilder, body: String) -> HttpResponse {
     response
         .set_header(http::header::CONTENT_TYPE, "text/html; charset=utf-8")
