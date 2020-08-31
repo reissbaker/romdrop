@@ -133,7 +133,10 @@ async fn render_upload<'a>(emulator: &EmulatorData<'a>) -> Result<HttpResponse> 
         .map_err(ErrorInternalServerError)?;
     Ok(html_response(
         HttpResponse::Ok()
-            .set_header(http::header::SET_COOKIE, "csrf=token; HttpOnly; SameSite=Lax; Path=/; Priority=High"),
+            .set_header(
+                http::header::SET_COOKIE,
+                "csrf=token; HttpOnly; SameSite=Lax; Path=/; Priority=High"
+            ),
         rendered
     ))
 }
