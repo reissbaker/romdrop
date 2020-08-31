@@ -147,7 +147,7 @@ async fn upload_rom(
     let emulator = parse_emulator(&emulator_path.name)?;
 
     let mut csrf: Option<String> = None;
-    while let Ok(Some(mut field)) = payload.try_next().await {
+    while let Some(mut field) = payload.try_next().await? {
         let content_type = field
             .content_disposition()
             .ok_or_else(|| actix_web::error::ParseError::Incomplete)?;
