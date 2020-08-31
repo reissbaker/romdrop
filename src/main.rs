@@ -91,7 +91,7 @@ async fn index_page() -> Result<HttpResponse> {
     let rendered = reg
         .render_template(&index, &data)
         .map_err(ErrorInternalServerError)?;
-    Ok(html_response(HttpResponse::Ok(), rendered))
+    Ok(html_response(&mut HttpResponse::Ok(), rendered))
 }
 
 #[derive(Serialize)]
@@ -131,7 +131,11 @@ async fn render_upload<'a>(emulator: &EmulatorData<'a>) -> Result<HttpResponse> 
     let rendered = reg
         .render_template(&upload, &data)
         .map_err(ErrorInternalServerError)?;
-    Ok(html_response(HttpResponse::Ok(), rendered))
+    Ok(html_response(
+        HttpResponse::Ok()
+            .set_header(http::header::SET_COOKIE, "csrf=token; HttpOnly; SameSite=Lax; Path=/; Priority=High"),
+        rendered
+    ))
 }
 
 
@@ -239,8 +243,9 @@ async fn read_dir(path: &str) -> Result<Vec<String>> {
 }
 
 /// Given a ResponseBuilder, set its content type and body to return the string as HTML
-fn html_response(mut response: ResponseBuilder, body: String) -> HttpResponse {
+fn html_response(response: &mut ResponseBuilder, body: String) -> HttpResponse {
     response
         .set_header(http::header::CONTENT_TYPE, "text/html; charset=utf-8")
+        .set_header(http::header::X_FRAME_OPTIONS, "DENY")
         .body(body)
 }
