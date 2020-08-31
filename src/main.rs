@@ -1,9 +1,13 @@
 use std::{str, env};
+use bytes::Bytes;
 use actix_http::{
     error::ErrorUnprocessableEntity,
     ResponseBuilder,
 };
-use actix_multipart::Multipart;
+use actix_multipart::{
+    Multipart,
+    MultipartError,
+};
 use actix_web::{
     web,
     http,
@@ -15,7 +19,7 @@ use actix_web::{
     HttpServer,
     Result,
 };
-use actix_web::error::{ErrorInternalServerError, ErrorNotFound};
+use actix_web::error::{ErrorInternalServerError, ErrorNotFound, ErrorUnauthorized};
 use actix_files::Files;
 use handlebars::Handlebars;
 use tokio::stream::StreamExt;
@@ -96,6 +100,7 @@ struct UploadTemplateData<'a> {
     slug: &'a str,
     roms: &'a Vec<String>,
     no_roms: bool,
+    csrf: &'a str,
 }
 #[derive(Deserialize)]
 struct EmulatorPath {
@@ -107,14 +112,21 @@ struct EmulatorPath {
 #[get("/roms/{name}")]
 async fn emulator_page(emulator_path: web::Path<EmulatorPath>) -> Result<HttpResponse> {
     let emulator = parse_emulator(&emulator_path.name)?;
+    render_upload(&emulator).await
+}
+
+/// Renders the upload page
+async fn render_upload<'a>(emulator: &EmulatorData<'a>) -> Result<HttpResponse> {
     let reg = Handlebars::new();
     let upload = read_file("assets/pages/upload.html").await?;
     let roms = read_dir(&format!("data/roms/{}", emulator.slug)).await?;
+    let csrf = "token";
     let data = UploadTemplateData {
         emulator: &emulator.heading,
         slug: &emulator.slug,
         roms: &roms,
         no_roms: roms.len() == 0,
+        csrf: &csrf,
     };
     let rendered = reg
         .render_template(&upload, &data)
@@ -129,47 +141,54 @@ async fn upload_rom(
     mut payload: Multipart,
 ) -> Result<HttpResponse> {
     let emulator = parse_emulator(&emulator_path.name)?;
-    let reg = Handlebars::new();
 
-    // Parse the filename
-    let mut field = payload
-        .try_next()
-        .await?
-        .ok_or_else(|| ErrorUnprocessableEntity("No files sent"))?;
-    let content_type = field
-        .content_disposition()
-        .ok_or_else(|| actix_web::error::ParseError::Incomplete)?;
-    let filename = content_type
-        .get_filename()
-        .ok_or_else(|| actix_web::error::ParseError::Incomplete)?;
-    let path = sanitize_filename::sanitize(&filename);
+    let mut csrf: Option<String> = None;
+    while let Ok(Some(mut field)) = payload.try_next().await {
+        let content_type = field
+            .content_disposition()
+            .ok_or_else(|| actix_web::error::ParseError::Incomplete)?;
 
-    // Create the appropriate emulator dir if necessary
-    let dir = format!("data/roms/{}", emulator.slug);
-    tokio::fs::create_dir_all(dir.clone()).await?;
+        match content_type.get_name() {
+            Some("csrf") => {
+                let bytes = field.collect::<std::result::Result<Bytes, MultipartError>>().await?;
+                let token = String::from_utf8(bytes.to_vec()).map_err(|_| {
+                    ErrorUnprocessableEntity("CSRF token must be UTF-8")
+                })?;
+                csrf = Some(token);
+            },
+            Some("filename") => {
+                if let None = csrf {
+                    return Err(ErrorUnauthorized("Not authorized; please reload and try again"));
+                }
+                let filename = content_type
+                    .get_filename()
+                    .ok_or_else(|| actix_web::error::ParseError::Incomplete)?;
+                let path = sanitize_filename::sanitize(&filename);
 
-    // Write all the bytes of the stream to disk
-    let mut file = tokio::fs::File::create(
-        format!("{}/{}", dir, path)
-    ).await?;
-    while let Some(chunk) = field.next().await {
-        let data = chunk?;
-        file.write_all(&data).await?
+                // Create the appropriate emulator dir if necessary
+                let dir = format!("data/roms/{}", emulator.slug);
+                tokio::fs::create_dir_all(dir.clone()).await?;
+
+                // Write all the bytes of the stream to disk
+                let mut file = tokio::fs::File::create(
+                    format!("{}/{}", dir, path)
+                ).await?;
+                while let Some(chunk) = field.next().await {
+                    let data = chunk?;
+                    file.write_all(&data).await?
+                }
+            },
+            Some(other) => {
+                return Err(ErrorUnprocessableEntity(format!("Unknown field {}", other)));
+            }
+            None => {
+                return Err(ErrorUnprocessableEntity("Missing field name"));
+            }
+        }
     }
 
     // Render the upload page so people can upload more ROMs
-    let upload_templ = read_file("assets/pages/upload.html").await?;
-    let roms = read_dir(&format!("data/roms/{}", emulator.slug)).await?;
-    let data = UploadTemplateData {
-        emulator: &emulator.heading,
-        slug: &emulator.slug,
-        roms: &roms,
-        no_roms: roms.len() == 0,
-    };
-    let rendered = reg
-        .render_template(&upload_templ, &data)
-        .map_err(ErrorInternalServerError)?;
-    Ok(html_response(HttpResponse::Created(), rendered))
+    render_upload(&emulator).await
 }
 
 /// Given a slug, returns the matching EmulatorData.

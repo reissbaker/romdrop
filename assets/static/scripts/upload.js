@@ -191,6 +191,7 @@
   const dragoverText = document.getElementById("dragover-text");
   const uploadCta = uploadForm.querySelector('.upload-cta');
   const uploading = uploadForm.querySelector('.uploading');
+  const csrf = uploadForm.querySelector('.csrf-token');
 
   forTarget(document.body, {
     enter() { dragoverText.classList.remove("hidden"); },
@@ -200,7 +201,8 @@
       const files = e.dataTransfer.files;
       const success = await animateProgress(uploadForm, (progress) => {
         const formData = new FormData();
-        formData.append('file', files[0]);
+        formData.append('csrf', csrf.value);
+        formData.append('filename', files[0]);
 
         return xhr({
           progress,

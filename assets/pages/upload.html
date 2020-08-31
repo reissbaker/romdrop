@@ -22,6 +22,7 @@
         action="/roms/{{ slug }}"
         enctype="multipart/form-data"
       >
+        <input type="hidden" name="csrf" class="csrf-token" value="{{csrf}}">
         <div class="hidden progress-bar">
           <div class="progress-percent"></div>
         </div>
